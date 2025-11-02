@@ -1,70 +1,73 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
+import networkx as nx
+import matplotlib.pyplot as plt
+import os
 
 app = Flask(__name__)
 
-# Dijkstra Algorithm Function
-def dijkstra(graph, start):
-    shortest_distance = {}
-    predecessor = {}
-    unseen_nodes = graph.copy()
-    infinity = float('inf')
-
-    for node in unseen_nodes:
-        shortest_distance[node] = infinity
-    shortest_distance[start] = 0
-
-    while unseen_nodes:
-        min_node = None
-        for node in unseen_nodes:
-            if min_node is None:
-                min_node = node
-            elif shortest_distance[node] < shortest_distance[min_node]:
-                min_node = node
-
-        for child_node, weight in graph[min_node].items():
-            if weight + shortest_distance[min_node] < shortest_distance[child_node]:
-                shortest_distance[child_node] = weight + shortest_distance[min_node]
-                predecessor[child_node] = min_node
-        unseen_nodes.pop(min_node)
-
-    return shortest_distance, predecessor
+# Create a sample weighted graph
+def create_graph():
+    G = nx.Graph()
+    edges = [
+        ("A", "B", 6),
+        ("A", "D", 1),
+        ("B", "D", 2),
+        ("B", "E", 2),
+        ("B", "C", 5),
+        ("C", "E", 5),
+        ("D", "E", 1)
+    ]
+    G.add_weighted_edges_from(edges)
+    return G
 
 
-@app.route('/', methods=['GET', 'POST'])
+def dijkstra_shortest_path(G, start, end):
+    try:
+        path = nx.dijkstra_path(G, start, end, weight="weight")
+        distance = nx.dijkstra_path_length(G, start, end, weight="weight")
+        return path, distance
+    except nx.NetworkXNoPath:
+        return None, None
+
+
+@app.route("/", methods=["GET", "POST"])
 def index():
     result = None
-    if request.method == 'POST':
-        start = request.form['start'].upper().strip()
-        end = request.form['end'].upper().strip()
+    path_img = None
+    if request.method == "POST":
+        start = request.form["start"].upper().strip()
+        end = request.form["end"].upper().strip()
 
-        graph = {
-            'A': {'B': 6, 'D': 1},
-            'B': {'A': 6, 'D': 2, 'E': 2, 'C': 5},
-            'C': {'B': 5, 'E': 5},
-            'D': {'A': 1, 'B': 2, 'E': 1},
-            'E': {'B': 2, 'D': 1, 'C': 5}
-        }
+        G = create_graph()
 
-        if start not in graph or end not in graph:
-            result = "Invalid nodes! Please enter between A–E."
+        if start not in G.nodes or end not in G.nodes:
+            result = "❌ Invalid nodes! Please use nodes A–E."
         else:
-            distances, predecessors = dijkstra(graph, start)
+            path, distance = dijkstra_shortest_path(G, start, end)
+            if path:
+                result = f" Shortest Path: {' → '.join(path)} | Total Distance: {distance} km"
 
-            path = []
-            current = end
-            while current != start:
-                try:
-                    path.insert(0, current)
-                    current = predecessors[current]
-                except KeyError:
-                    result = " Path not reachable."
-                    break
-            path.insert(0, start)
-            if result is None:
-                result = f"Shortest Path: {' → '.join(path)} | Total Distance: {distances[end]} km"
+                # Draw the graph
+                pos = nx.spring_layout(G)
+                plt.figure(figsize=(6, 4))
+                nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1500, font_size=10)
+                edge_labels = nx.get_edge_attributes(G, 'weight')
+                nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    return render_template('index.html', result=result)
+                # Highlight shortest path
+                path_edges = list(zip(path, path[1:]))
+                nx.draw_networkx_nodes(G, pos, nodelist=path, node_color='orange')
+                nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='red', width=2)
+
+                os.makedirs("static", exist_ok=True)
+                plt.savefig("static/graph.png")
+                plt.close()
+                path_img = "static/graph.png"
+            else:
+                result = " Path not reachable."
+
+    return render_template("index.html", result=result, path_img=path_img)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
