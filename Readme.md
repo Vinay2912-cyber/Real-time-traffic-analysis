@@ -38,8 +38,6 @@ The system takes city routes and traffic conditions as input and visualizes the 
 python -m venv venv
 # Windows
 venv\Scripts\activate
-# macOS/Linux
-source venv/bin/activate
 
 3. Install Dependencies
 
@@ -49,13 +47,11 @@ pip install -r requirements.txt
 
 python app.py
 
-Then open your browser and visit:
-👉 http://127.0.0.1:5000/
+Then open your browser and visit: http://127.0.0.1:5000/
 
 
 ---
-
-🧮 How It Works
+ How It Works
 
 1. User enters Start Node and End Node (A–E).
 
@@ -70,8 +66,6 @@ Then open your browser and visit:
 🔴 Red edges → Shortest path
 
 🟠 Orange nodes → Path highlights
-
-
 
 4. Result + total distance displayed on screen.
 
