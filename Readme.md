@@ -27,3 +27,53 @@ The system takes city routes and traffic conditions as input and visualizes the 
 ---
 
 ## Project Structure
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the Repository
+```bash
+2.Create a Virtual Environment (optional but recommended)
+
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+
+3. Install Dependencies
+
+pip install -r requirements.txt
+
+4. Run the App
+
+python app.py
+
+Then open your browser and visit:
+👉 http://127.0.0.1:5000/
+
+
+---
+
+🧮 How It Works
+
+1. User enters Start Node and End Node (A–E).
+
+
+2. Flask calls NetworkX to compute shortest path using Dijkstra’s Algorithm.
+
+
+3. Matplotlib dynamically plots the graph:
+
+🔵 Blue nodes → All cities
+
+🔴 Red edges → Shortest path
+
+🟠 Orange nodes → Path highlights
+
+
+
+4. Result + total distance displayed on screen.
+
+
+5. Graph image updates instantly (no browser cache).
