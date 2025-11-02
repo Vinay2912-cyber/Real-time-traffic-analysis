@@ -2,29 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Real-Time Traffic Analysis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>🚦 Real-Time Traffic Path Finder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2b5876, #4e4376);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 450px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        .btn {
+            background-color: #ffb347;
+            color: black;
+            border: none;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #ffcc33;
+        }
+        img {
+            margin-top: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #000;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1> Real-Time Traffic Analysis</h1>
-        <p class="subtitle">Find the shortest path using Dijkstra’s Algorithm</p>
-
-        <form method="POST">
-            <label>Start Node:</label>
-            <input type="text" name="start" placeholder="Enter start (A, B, C...)" required>
-
-            <label>Destination Node:</label>
-            <input type="text" name="end" placeholder="Enter end (A, B, C...)" required>
-
-            <button type="submit">Find Shortest Path</button>
+    <div class="card">
+        <h2> Real-Time Traffic Path Finder</h2>
+        <form method="POST" class="mt-3">
+            <div class="mb-3">
+                <label>Start Node (A–E):</label>
+                <input type="text" name="start" class="form-control text-uppercase" required>
+            </div>
+            <div class="mb-3">
+                <label>End Node (A–E):</label>
+                <input type="text" name="end" class="form-control text-uppercase" required>
+            </div>
+            <button type="submit" class="btn w-100">Find Shortest Path</button>
         </form>
 
         {% if result %}
-        <div class="result">
-            <h3>Result:</h3>
-            <p>{{ result }}</p>
-        </div>
+            <div class="alert alert-info mt-3">{{ result }}</div>
+        {% endif %}
+
+        {% if path_img %}
+            <img src="{{ path_img }}" alt="Graph Visualization" width="100%">
         {% endif %}
     </div>
 </body>
